@@ -285,4 +285,6 @@ target/site/jacoco/index.html
 
 Java Developer | Backend Enthusiast | Industrial Systems Integration
 
+## 📁 Documentação
 
+- [Visão geral do Front-End (Mockups e Telas)](docs/frontend-vision.md)
