@@ -1,10 +1,7 @@
 package com.example.maintenance_Intelligence_system.models;
 
 import com.example.maintenance_Intelligence_system.enums.StatusOrder;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -20,7 +17,7 @@ public class TechnicalReport {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
-    Machine machine;
+
     String operator;
     String observation;
     String problemFound;
@@ -28,6 +25,13 @@ public class TechnicalReport {
     StatusOrder statusOrder;
     LocalDateTime startTime;
     LocalDateTime closeTime;
+
+    @ManyToOne
+    @JoinColumn(name = "machine_id")
+    Machine machine;
+
+    @ManyToOne
+    @JoinColumn(name = "technician_id")
     Technician technicianResponsible;
 
 
