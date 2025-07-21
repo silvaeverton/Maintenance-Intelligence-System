@@ -1,5 +1,7 @@
 package com.example.maintenance_Intelligence_system.models;
 
+import com.example.maintenance_Intelligence_system.enums.PriorityCategory;
+import com.example.maintenance_Intelligence_system.enums.ProblemCategory;
 import com.example.maintenance_Intelligence_system.enums.StatusOrder;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -25,6 +27,9 @@ public class TechnicalReport {
     StatusOrder statusOrder;
     LocalDateTime startTime;
     LocalDateTime closeTime;
+    LocalDateTime acceptedCalled;
+    ProblemCategory problemCategory;
+    PriorityCategory priorityCategory;
 
     @ManyToOne
     @JoinColumn(name = "machine_id")
