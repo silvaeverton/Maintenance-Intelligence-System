@@ -1,8 +1,10 @@
 package com.example.maintenance_Intelligence_system.services;
 
 import com.example.maintenance_Intelligence_system.dtos.RequestOrderServiceDto;
+import com.example.maintenance_Intelligence_system.dtos.RequestOsDtoExe;
 import com.example.maintenance_Intelligence_system.dtos.ResponseOrderServiceDto;
 import com.example.maintenance_Intelligence_system.enums.PriorityCategory;
+import com.example.maintenance_Intelligence_system.enums.StatusOrder;
 import com.example.maintenance_Intelligence_system.models.OrderService;
 
 import java.time.LocalDate;
@@ -14,10 +16,11 @@ public interface ServiceOrderService {
     public List<ResponseOrderServiceDto> allOrder();
     public List<ResponseOrderServiceDto> findOrderByPriority(PriorityCategory priorityCategory);
     public List<ResponseOrderServiceDto> findOrderByDateBetween(LocalDate start,LocalDate end);
-    public OrderService updateOrderService(Long idOrder, RequestOrderServiceDto dto);
-    public void canceledOrderService(Long idOrder);
-    public void definePriorityOrder(Long idOrder);
-    public void executedOrderService(Long idOrder);
+    public List<ResponseOrderServiceDto> findOrderByTechnician(Long idTechnician);
+    public OrderService updateOrderService(Long idOrder, RequestOsDtoExe dto);
+    public void definePriorityOrder(Long idOrder, PriorityCategory priorityCategory);
+    public void alterStatusOrderService(Long idOrder, StatusOrder statusOrder);
+    public OrderService searchOrderById(Long idOrder);
 
 
 }
