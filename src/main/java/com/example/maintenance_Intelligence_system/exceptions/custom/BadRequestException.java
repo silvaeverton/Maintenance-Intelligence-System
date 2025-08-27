@@ -1,7 +1,13 @@
-package com.example.maintenance_Intelligence_system.services.serviceImpl;
+package com.example.maintenance_Intelligence_system.exceptions.custom;
 
+import lombok.Getter;
+
+@Getter
 public class BadRequestException extends RuntimeException {
-  public BadRequestException(String message) {
-    super(message);
-  }
+    private final Integer status;
+
+    public BadRequestException(final String message, final Integer status) {
+        super(message);
+        this.status = status;
+    }
 }

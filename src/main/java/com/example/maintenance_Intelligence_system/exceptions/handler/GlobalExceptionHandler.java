@@ -1,5 +1,6 @@
 package com.example.maintenance_Intelligence_system.exceptions.handler;
 
+import com.example.maintenance_Intelligence_system.exceptions.custom.BadRequestException;
 import com.example.maintenance_Intelligence_system.exceptions.custom.NotFoundException;
 import com.example.maintenance_Intelligence_system.exceptions.response.Error;
 import org.springframework.http.HttpStatus;
@@ -27,12 +28,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     ResponseEntity<Error> handlerExceptionGenerics(Exception e){
+        e.printStackTrace();
+
         Error error = Error.builder()
                 .status(500)
-                .message(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR))
+                .message(e.getMessage())
                 .build();
 
-        return new  ResponseEntity<>(error,HttpStatus.INTERNAL_SERVER_ERROR);
+        return  ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(error);
     }
 
 
@@ -53,5 +58,16 @@ public class GlobalExceptionHandler {
                 .build();
 
         return new ResponseEntity<>(error,HttpStatusCode.valueOf(e.getStatusCode().value()));
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    ResponseEntity<Error> handlerBadRequestException( BadRequestException e) {
+
+        Error error = Error.builder()
+                .message(e.getMessage())
+                .status(e.getStatus())
+                .build();
+
+        return  new ResponseEntity<>(error,HttpStatus.BAD_REQUEST);
     }
 }
