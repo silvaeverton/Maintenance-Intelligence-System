@@ -1,22 +1,29 @@
 package com.example.maintenance_Intelligence_system.services.serviceImpl;
 
-import com.example.maintenance_Intelligence_system.dtos.RequestESP32Dto;
-import com.example.maintenance_Intelligence_system.dtos.RequestTechnicalReportDto;
-import com.example.maintenance_Intelligence_system.dtos.ResponseTechnicalReportDto;
+import com.example.maintenance_Intelligence_system.dtos.*;
+import com.example.maintenance_Intelligence_system.enums.GenericState;
+import com.example.maintenance_Intelligence_system.enums.RequestCategoryOS;
 import com.example.maintenance_Intelligence_system.enums.StatusMachine;
 import com.example.maintenance_Intelligence_system.enums.StatusOrder;
 import com.example.maintenance_Intelligence_system.exceptions.custom.BadRequestException;
 import com.example.maintenance_Intelligence_system.exceptions.custom.NotFoundException;
+import com.example.maintenance_Intelligence_system.mappers.ReportTechnicalArchiveMapper;
 import com.example.maintenance_Intelligence_system.mappers.TechnicianReportMapper;
 import com.example.maintenance_Intelligence_system.models.Machine;
 import com.example.maintenance_Intelligence_system.models.TechnicalReport;
+import com.example.maintenance_Intelligence_system.models.TechnicalReportArchive;
 import com.example.maintenance_Intelligence_system.models.Technician;
 import com.example.maintenance_Intelligence_system.repositories.MachineRepository;
+import com.example.maintenance_Intelligence_system.repositories.TechnicalReportArchiveRepository;
 import com.example.maintenance_Intelligence_system.repositories.TechnicianReportRepository;
 import com.example.maintenance_Intelligence_system.services.MachineService;
 import com.example.maintenance_Intelligence_system.services.TechnicalReportService;
 import com.example.maintenance_Intelligence_system.services.TechnicianService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -25,9 +32,12 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+
 @Service
 @RequiredArgsConstructor
-public class ServiceTechnicianReportService implements TechnicalReportService {
+public class TechnicalReportServiceImpl implements TechnicalReportService {
+
+    private final TechnicalReportArchiveRepository technicalReportArchiveRepository;
 
     private final TechnicianReportRepository technicianReportRepository;
 
@@ -42,20 +52,28 @@ public class ServiceTechnicianReportService implements TechnicalReportService {
     public TechnicalReport openTechnicalReport(RequestESP32Dto requestESP32Dto) {
 
         Machine machine = machineService.searchMachineById(requestESP32Dto.getMachineId());
-        TechnicalReport report = new TechnicalReport();
-        report.setMachine(machine);
-        report.setStartTime(LocalDateTime.now());
-        report.setStatusOrder(StatusOrder.OPEN);
-        report.setStatusMachine(requestESP32Dto.getStatusMachine());
 
-        return technicianReportRepository.saveAndFlush(report);
+        if(machine.getGenericState().equals(GenericState.ACTIVE)) {
+            TechnicalReport report = new TechnicalReport();
+            report.setMachine(machine);
+            report.setStartTime(LocalDateTime.now());
+            report.setStatusOrder(StatusOrder.OPEN);
+            report.setStatusMachine(requestESP32Dto.getStatusMachine());
+            report.setTypeOfStop(report.getStatusMachine().toString());
+
+            return technicianReportRepository.saveAndFlush(report);
+        } else {
+            throw  new BadRequestException("Unable to create report! Machine inactive", 400);
+        }
+
+
     }
 
     @Override
-    public TechnicalReport toAlterTechnicalReport(RequestESP32Dto requestESP32Dto) {
-        List<TechnicalReport> report = technicianReportRepository.findByMachineId(requestESP32Dto.getMachineId());
+    public TechnicalReport toAlterTechnicalReport(AlterESP32Dto alterESP32Dto) {
+        List<TechnicalReport> report = technicianReportRepository.findByMachine_Id(alterESP32Dto.getMachineId());
 
-        Machine machine = machineService.searchMachineById(requestESP32Dto.getMachineId());
+        Machine machine = machineService.searchMachineById(alterESP32Dto.getMachineId());
 
         Optional<TechnicalReport> reportOptional = report.stream()
                 .filter(r -> r.getStatusOrder().equals(StatusOrder.IN_PROGRESS))
@@ -68,7 +86,7 @@ public class ServiceTechnicianReportService implements TechnicalReportService {
         TechnicalReport technicalReport = reportOptional.get();
         technicalReport.setCloseTime(LocalDateTime.now());
         technicalReport.setStatusOrder(StatusOrder.FINISH);
-        technicalReport.setStatusMachine(StatusMachine.IN_MAINTENANCE_MACHINE_OPERATED);
+        technicalReport.setStatusMachine(StatusMachine.MACHINE_OPERATED);
 
 
         machineRepository.saveAndFlush(machine);
@@ -77,8 +95,8 @@ public class ServiceTechnicianReportService implements TechnicalReportService {
     }
 
     @Override
-    public TechnicalReport updateTechnicalReport(RequestTechnicalReportDto dto) {
-        TechnicalReport reportExist = searchRtById(dto.getId());
+    public TechnicalReport updateTechnicalReport(Long idReport,RequestTechnicalReportDto dto) {
+        TechnicalReport reportExist = searchRtById(idReport);
         Technician technician = technicianService.searchTechnicianById(dto.getTechnicianId());
 
         if(reportExist.getStatusOrder().equals(StatusOrder.CLOSED)) {
@@ -106,61 +124,65 @@ public class ServiceTechnicianReportService implements TechnicalReportService {
     }
 
     @Override
-    public List<ResponseTechnicalReportDto> allReposts() {
-        List<TechnicalReport>  reports = technicianReportRepository.findAll();
+    public Page<ResumeReportTechnicalDto> allReposts(Pageable pageable) {
+        Page<TechnicalReport>  reports = technicianReportRepository.findAll(pageable);
 
         if(reports.isEmpty()) {
             throw new NotFoundException("Report List Not Found",404);
         }
 
-        return TechnicianReportMapper.toDtoList(reports);
+        return TechnicianReportMapper.toResumePage(reports);
     }
 
     @Override
-    public List<ResponseTechnicalReportDto> reportsByMachine(Long idMachine) {
-        List<TechnicalReport> reports = technicianReportRepository.findByMachineId(idMachine);
+    public Page<ResumeReportTechnicalDto> reportsByMachine(Long idMachine, Pageable pageable) {
+        Page<TechnicalReport> reports = technicianReportRepository.findByMachine_Id(idMachine,pageable);
 
         if(reports.isEmpty()) {
             throw new NotFoundException("There are no reports for this machine",404);
         }
-        return TechnicianReportMapper.toDtoList(reports);
+        return TechnicianReportMapper.toResumePage(reports);
 
     }
 
     @Override
-    public List<ResponseTechnicalReportDto> reportsByTechnician(Long idTech) {
-        List<TechnicalReport> reports = technicianReportRepository.findByTechnicianId(idTech);
+    public Page<ResumeReportTechnicalDto> reportsByTechnician(Long idTech, Pageable pageable) {
+        Page<TechnicalReport> reports = technicianReportRepository.findByTechnicianResponsible_Id(idTech,pageable);
 
         if(reports.isEmpty()) {
             throw new NotFoundException("There are no reports for this technician",404);
         }
 
-        return TechnicianReportMapper.toDtoList(reports);
+        return TechnicianReportMapper.toResumePage(reports);
     }
 
     @Override
-    public List<ResponseTechnicalReportDto> findByDateBetween(LocalDate start, LocalDate end) {
+    public Page<ResumeReportTechnicalDto> findByDateBetween(LocalDate start, LocalDate end, Pageable pageable) {
+
         LocalDateTime startDateTime = start.atStartOfDay();
         LocalDateTime endDateTime = end.atTime(LocalTime.MAX);
 
-        List<TechnicalReport> reports = technicianReportRepository.findByDateBetween(startDateTime,endDateTime);
+        Page<TechnicalReport> reports = technicianReportRepository.findByStartTimeBetween(startDateTime,endDateTime,pageable);
 
         if(reports.isEmpty()) {
             throw new NotFoundException("There is no Report for the Selected date",404);
         }
-        return TechnicianReportMapper.toDtoList(reports);
+        return TechnicianReportMapper.toResumePage(reports);
     }
 
     @Override
     public void toCloseReport(Long idReport) {
         TechnicalReport report = searchRtById(idReport);
+        Machine machine = machineService.searchMachineById(report.getMachine().getId());
 
         if(report.getStatusOrder().equals(StatusOrder.CLOSED)) {
             throw new BadRequestException("The Report is Closed",400);
         }
         report.setStatusOrder(StatusOrder.CLOSED);
+        machine.setStatusMachine(machine.getStatusMachine());
 
         technicianReportRepository.saveAndFlush(report);
+        machineRepository.saveAndFlush(machine);
 
     }
 
@@ -172,6 +194,7 @@ public class ServiceTechnicianReportService implements TechnicalReportService {
 
             technicalReport.setStatusOrder(StatusOrder.IN_PROGRESS);
             technicalReport.setAcceptedCalled(LocalDateTime.now());
+            technicalReport.setRequestCategoryOS(RequestCategoryOS.CORRECTIVE);
 
             technicianReportRepository.saveAndFlush(technicalReport);
 
@@ -180,6 +203,49 @@ public class ServiceTechnicianReportService implements TechnicalReportService {
         }
 
     }
+
+    @Override
+    public List<TechnicalReport> searchDateBetween(LocalDateTime start, LocalDateTime end) {
+
+        return technicianReportRepository.findByStartTimeBetween(start,end);
+
+    }
+
+    @Override
+    public List<TechnicalReport> findReportsOlderThanTwoYear() {
+
+        LocalDate twoYearAgo = LocalDate.now().minusYears(2);
+        return technicianReportRepository.findByStartTimeBefore(twoYearAgo);
+    }
+
+    @Override
+    @Transactional
+    public void archiveOldReports() {
+        List<TechnicalReport> oldReports = findReportsOlderThanTwoYear();
+
+        for(TechnicalReport report : oldReports) {
+            TechnicalReportArchive archived = new TechnicalReportArchive(report);
+            technicalReportArchiveRepository.save(archived);
+            technicianReportRepository.delete(report);
+        }
+    }
+
+    @Override
+    public List<ResponseTechnicalReportDto> listArchiveReport() {
+        List<TechnicalReportArchive> reportArchiveList = technicalReportArchiveRepository.findAll();
+
+
+        if(reportArchiveList.isEmpty()) {
+            throw new NotFoundException("The Archive Report List not found", 404);
+        }
+        return ReportTechnicalArchiveMapper.toDtoList(reportArchiveList);
+    }
+
+    @Scheduled(cron = "0 0 2 1 * *")
+    public void scheduleArchive() {
+        archiveOldReports();
+    }
+
 
     public TechnicalReport searchRtById(Long idReport) {
         return technicianReportRepository.findById(idReport).orElseThrow(()-> new NotFoundException("Report not Found",404));

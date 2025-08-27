@@ -14,7 +14,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ServiceTechnicianService implements TechnicianService {
+public class TechnicianServiceImpl implements TechnicianService {
 
     private final TechnicianRepository technicianRepository;
 
@@ -24,6 +24,7 @@ public class ServiceTechnicianService implements TechnicianService {
         Technician technician = new Technician();
         technician.setName(dto.getName());
         technician.setRegistration(dto.getRegistration());
+        technician.setGenericState(GenericState.ACTIVE);
 
         return technicianRepository.saveAndFlush(technician);
     }

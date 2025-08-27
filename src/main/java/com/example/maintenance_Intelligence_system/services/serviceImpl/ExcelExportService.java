@@ -2,9 +2,9 @@ package com.example.maintenance_Intelligence_system.services.serviceImpl;
 
 import com.example.maintenance_Intelligence_system.models.Machine;
 import com.example.maintenance_Intelligence_system.models.TechnicalReport;
-import com.example.maintenance_Intelligence_system.services.ExcelExportService;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,8 +13,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
-public class ExcelExportServiceImpl implements ExcelExportService {
-    @Override
+@Service
+public class ExcelExportService {
+
     public byte[] generateExcel(List<TechnicalReport> resportList) {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Relatório Técnicos");
@@ -30,7 +31,7 @@ public class ExcelExportServiceImpl implements ExcelExportService {
             headerStyle.setBorderBottom(BorderStyle.THIN);
 
             String[] headers = {
-                    "ID", "Operator", "Machine", "OS Status", "Machine Status", "Category", "Problem", "Solution",
+                    "ID", "Operator", "Machine", "OS Status", "Type Problem", "Category", "Problem", "Solution",
                     "Start Time", "End Time", "Accepted Date", "Technician", "Stop Type"
             };
 
@@ -54,7 +55,7 @@ public class ExcelExportServiceImpl implements ExcelExportService {
                 row.createCell(1).setCellValue(Optional.ofNullable(report.getOperator()).orElse("-"));
                 row.createCell(2).setCellValue(Optional.ofNullable(report.getMachine()).map(Machine::getName).orElse("-"));
                 row.createCell(3).setCellValue(Optional.ofNullable(report.getStatusOrder()).map(Enum::name).orElse("-"));
-                row.createCell(4).setCellValue(Optional.ofNullable(report.getStatusMachine()).map(Enum::name).orElse("-"));
+                row.createCell(4).setCellValue(Optional.ofNullable(report.getProblemCategory()).map(Enum::name).orElse("-"));
                 row.createCell(5).setCellValue(Optional.ofNullable(report.getRequestCategoryOS()).map(Enum::name).orElse("-"));
                 row.createCell(6).setCellValue(Optional.ofNullable(report.getProblemFound()).orElse("-"));
                 row.createCell(7).setCellValue(Optional.ofNullable(report.getSolutionAdopted()).orElse("-"));
