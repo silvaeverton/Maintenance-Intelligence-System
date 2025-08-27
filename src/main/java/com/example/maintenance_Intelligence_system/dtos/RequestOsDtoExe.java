@@ -11,14 +11,14 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class RequestOsDtoExe {
-    String serviceToPerformed;
-    RequestCategoryOS categoryOS;
-    PriorityCategory priorityCategory;
-    StatusOrder statusOrder;
-    String problem;
-    String observation;
-    LocalDate expectedDate;
-    Long technicianId;
+    private String serviceToPerformed;
+    private RequestCategoryOS categoryOS;
+    private PriorityCategory priorityCategory;
+    private StatusOrder statusOrder;
+    private String problem;
+    private  String observation;
+    private LocalDate expectedDate;
+    private Long technicianId;
 
 
 }

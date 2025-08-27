@@ -11,15 +11,17 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class ResponseTechnicalReportDto {
-    Long machineId;
-    String operator;
-    String observation;
-    String problemFound;
-    String solutionAdopted;
-    StatusOrder statusOrder;
-    LocalDateTime startTime;
-    LocalDateTime closeTime;
-    Long technicianResponsibleId;
-    RequestCategoryOS categoryOS;
-    ProblemCategory problemCategory;
+    private Long id;
+    private String operator;
+    private String observation;
+    private String problemFound;
+    private String solutionAdopted;
+    private StatusOrder statusOrder;
+    private LocalDateTime startTime;
+    private LocalDateTime closeTime;
+    private ProblemCategory problemCategory;
+    private RequestCategoryOS requestCategoryOS;
+    private String typeOfStop;
+    private Long machineId;
+    private Long technicianId;
 }

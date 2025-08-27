@@ -1,7 +1,7 @@
 package com.example.maintenance_Intelligence_system.dtos;
 
 import com.example.maintenance_Intelligence_system.enums.ProblemCategory;
-import com.example.maintenance_Intelligence_system.enums.RequestCategoryOS;
+import com.example.maintenance_Intelligence_system.enums.StatusMachine;
 import com.example.maintenance_Intelligence_system.enums.StatusOrder;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -12,17 +12,15 @@ import lombok.Setter;
 @Setter
 @Getter
 public class RequestTechnicalReportDto {
-    Long id;
-    String operator;
-    String observation;
-    String problemFound;
-    String solutionAdopted;
-    StatusOrder statusOrder;
-    Long technicianId;
+
+    private String operator;
+    private String observation;
+    private String problemFound;
+    private String solutionAdopted;
+    private StatusOrder statusOrder;
+    private Long technicianId;
+    private StatusMachine statusMachine;
 
     @Enumerated(EnumType.STRING)
-    RequestCategoryOS categoryOS;
-
-    @Enumerated(EnumType.STRING)
-    ProblemCategory problemCategory;
+    private  ProblemCategory problemCategory;
 }

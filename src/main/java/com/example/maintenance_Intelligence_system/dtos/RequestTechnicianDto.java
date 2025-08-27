@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RequestTechnicianDto {
-    String name;
-    String registration;
+    private String name;
+    private  String registration;
 }

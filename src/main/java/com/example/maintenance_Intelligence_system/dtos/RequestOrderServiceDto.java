@@ -6,11 +6,11 @@ import lombok.Setter;
 @Setter
 @Getter
 public class RequestOrderServiceDto {
-    String requester;
-    String sector;
-    String lieder;
-    String serviceToPerformed;
-    String observation;
+    private String requester;
+    private String sector;
+    private String lieder;
+    private String serviceToPerformed;
+    private String observation;
 
 
 }
