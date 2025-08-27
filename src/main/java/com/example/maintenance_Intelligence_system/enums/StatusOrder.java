@@ -4,5 +4,6 @@ public enum StatusOrder {
     OPEN,
     CANCELED,
     CLOSED,
+    FINISH,
     IN_PROGRESS
 }
