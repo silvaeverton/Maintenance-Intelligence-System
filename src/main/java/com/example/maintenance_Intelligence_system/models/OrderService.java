@@ -1,5 +1,6 @@
 package com.example.maintenance_Intelligence_system.models;
 
+import com.example.maintenance_Intelligence_system.enums.GenericState;
 import com.example.maintenance_Intelligence_system.enums.PriorityCategory;
 import com.example.maintenance_Intelligence_system.enums.RequestCategoryOS;
 import com.example.maintenance_Intelligence_system.enums.StatusOrder;
@@ -18,22 +19,33 @@ public class OrderService {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    Long id;
-    String requester;
-    String sector;
-    String lieder;
-    String serviceToPerformed;
-    RequestCategoryOS categoryOS;
-    PriorityCategory priorityCategory;
-    StatusOrder statusOrder;
-    String problem;
-    String observation;
-    LocalDate dateRequisition;
-    LocalDate expectedDate;
-    LocalDate completionDate;
+    private Long id;
+    private String requester;
+    private String sector;
+    private String lieder;
+    private String serviceToPerformed;
+
+    @Enumerated(EnumType.STRING)
+    private RequestCategoryOS categoryOS;
+
+    @Enumerated(EnumType.STRING)
+    private PriorityCategory priorityCategory;
+
+    @Enumerated(EnumType.STRING)
+    private StatusOrder statusOrder;
+
+    private String problem;
+    private String observation;
+    private LocalDate dateRequisition;
+    private LocalDate expectedDate;
+
+    @Enumerated(EnumType.STRING)
+    private GenericState genericState;
+
+    private LocalDate completionDate;
 
     @ManyToOne
     @JoinColumn(name = "technician_id")
-    Technician technicianResponsible;
+    private Technician technicianResponsible;
 
 }

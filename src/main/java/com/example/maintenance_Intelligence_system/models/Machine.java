@@ -1,14 +1,14 @@
 package com.example.maintenance_Intelligence_system.models;
 
+import com.example.maintenance_Intelligence_system.enums.GenericState;
 import com.example.maintenance_Intelligence_system.enums.StatusMachine;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Setter
@@ -18,16 +18,15 @@ public class Machine {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    Long id;
-    String name;
-    String sector;
-    String manufacturer;
-    String model;
-    StatusMachine statusMachine;
+    private Long id;
+    private String name;
+    private String sector;
+    private String manufacturer;
+    private String model;
+    private GenericState genericState;
+    private StatusMachine statusMachine;
 
-    @OneToMany(mappedBy = "machine")
-    @JsonIgnore
-    List<TechnicalReport> reportList = new ArrayList<>();
+
 
 
 }

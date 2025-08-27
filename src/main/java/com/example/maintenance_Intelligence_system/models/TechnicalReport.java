@@ -1,7 +1,8 @@
 package com.example.maintenance_Intelligence_system.models;
 
-import com.example.maintenance_Intelligence_system.enums.PriorityCategory;
 import com.example.maintenance_Intelligence_system.enums.ProblemCategory;
+import com.example.maintenance_Intelligence_system.enums.RequestCategoryOS;
+import com.example.maintenance_Intelligence_system.enums.StatusMachine;
 import com.example.maintenance_Intelligence_system.enums.StatusOrder;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -18,26 +19,36 @@ public class TechnicalReport {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    Long id;
+    private Long id;
+    private String operator;
+    private String observation;
+    private String problemFound;
+    private String solutionAdopted;
 
-    String operator;
-    String observation;
-    String problemFound;
-    String solutionAdopted;
-    StatusOrder statusOrder;
-    LocalDateTime startTime;
-    LocalDateTime closeTime;
-    LocalDateTime acceptedCalled;
-    ProblemCategory problemCategory;
-    PriorityCategory priorityCategory;
+    @Enumerated(EnumType.STRING)
+    private StatusOrder statusOrder;
+
+    @Enumerated(EnumType.STRING)
+    private StatusMachine statusMachine;
+    private String typeOfStop;
+    private LocalDateTime startTime;
+    private LocalDateTime closeTime;
+
+    @Enumerated(EnumType.STRING)
+    private RequestCategoryOS requestCategoryOS;
+    private LocalDateTime acceptedCalled;
+
+    @Enumerated(EnumType.STRING)
+    private ProblemCategory problemCategory;
+
 
     @ManyToOne
     @JoinColumn(name = "machine_id")
-    Machine machine;
+    private Machine machine;
 
     @ManyToOne
     @JoinColumn(name = "technician_id")
-    Technician technicianResponsible;
+    private Technician technicianResponsible;
 
 
 }

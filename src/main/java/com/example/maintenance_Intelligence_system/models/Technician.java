@@ -1,13 +1,13 @@
 package com.example.maintenance_Intelligence_system.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import com.example.maintenance_Intelligence_system.enums.GenericState;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Setter
@@ -17,16 +17,11 @@ public class Technician {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    Long id;
-    String name;
-    String registration;
+    private Long id;
+    private String name;
+    private String registration;
+    private GenericState genericState;
 
-    @OneToMany(mappedBy = "technician")
-    @JsonIgnore
-    List<TechnicalReport> reportList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "technician")
-    @JsonIgnore
-    List<OrderService> orderServices = new ArrayList<>();
 
 }
